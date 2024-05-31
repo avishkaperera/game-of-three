@@ -13,7 +13,7 @@
 	<groupId>com.justeattakeaway.codechallenge</groupId>
 	<artifactId>game-of-three</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>game-of-three</name>
+	<name>game-of-three-server</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
