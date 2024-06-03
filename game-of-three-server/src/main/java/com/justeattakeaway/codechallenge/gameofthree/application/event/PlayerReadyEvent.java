@@ -7,12 +7,12 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class GameInitEvent extends GameEvent {
+public class PlayerReadyEvent extends GameEvent {
     private final PlayerRole playerRole;
     private final UUID gameId;
 
-    public GameInitEvent(GameState gameState, String message, PlayerRole playerRole, UUID gameId) {
-        super(gameState, message, "GAME_INIT_EVENT");
+    public PlayerReadyEvent(GameState gameState, String message, PlayerRole playerRole, UUID gameId) {
+        super(gameState, message, "PLAYER_READY_EVENT");
         this.playerRole = playerRole;
         this.gameId = gameId;
     }

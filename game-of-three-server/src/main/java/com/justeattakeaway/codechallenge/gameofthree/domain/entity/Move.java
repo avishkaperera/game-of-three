@@ -28,10 +28,8 @@ public class Move {
             addedValue = userMove;
             resultingValue = (currentNumber + userMove);
         } else {
-            if ((currentNumber + userMove) % 3 == 0) {
-                addedValue = userMove;
-                resultingValue = (currentNumber + userMove) / 3;
-            }
+            addedValue = userMove;
+            resultingValue = (currentNumber + userMove) / 3;
         }
     }
 }

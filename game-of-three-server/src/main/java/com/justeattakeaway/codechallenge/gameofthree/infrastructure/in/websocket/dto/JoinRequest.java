@@ -1,4 +1,4 @@
 package com.justeattakeaway.codechallenge.gameofthree.infrastructure.in.websocket.dto;
 
-public record JoinRequest(String playerName, String playerMode) {
+public record JoinRequest(String playerName, String playMode) {
 }

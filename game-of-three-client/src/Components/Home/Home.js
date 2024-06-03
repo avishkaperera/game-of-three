@@ -7,17 +7,17 @@ const Home = () => {
 
     const [wsClient, setWsClient] = useState(null);
     const [connected, setConnnected] = useState(false);
-    const [game, setGame] = useState({ gameId: '', playerName: '', playerMode: false, playerRole: '', messages: [], gameState: 'PENDING' });
+    const [game, setGame] = useState({ gameId: '', playerName: '', playMode: false, playerRole: '', messages: [], gameState: 'PENDING' });
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
         const newClient = new Client({
             webSocketFactory: () => new SockJS('http://localhost:8080/gameofthree/connect'),
             onConnect: () => {
-                newClient.subscribe('/topic/game.event', (req) => {
+                newClient.subscribe('/generic/game.event', (req) => {
                     handleGameEvents(JSON.parse(req.body));
                 });
-                newClient.subscribe('/user/queue/game.event', (req) => {
+                newClient.subscribe('/user/specific/game.event', (req) => {
                     handleUserEvents(JSON.parse(req.body));
                 });
                 setConnnected(true);
@@ -52,16 +52,22 @@ const Home = () => {
     };
 
     const handleGameEvents = (event) => {
-        setMessages(prevMessages => [...prevMessages, event.message]);
-        setGame(prevGame => ({ ...prevGame, gameState: event.gameState }));
+        if (event.gameState === 'ERROR') {
+            alert(event.message);
+            setGame({ gameId: '', playerName: '', playMode: false, playerRole: '', messages: [], gameState: 'PENDING' });
+            setMessages([])
+        } else {
+            setMessages(prevMessages => [...prevMessages, event.message]);
+            setGame(prevGame => ({ ...prevGame, gameState: event.gameState }));
+        }
     }
 
     const handleNameInput = (event) => {
         setGame(prevGame => ({ ...prevGame, playerName: event.target.value }));
     }
 
-    const handlePlayerMode = (event) => {
-        setGame(prevGame => ({ ...prevGame, playerMode: !game.playerMode }))
+    const handlePlayMode = (event) => {
+        setGame(prevGame => ({ ...prevGame, playMode: !game.playMode }))
     };
 
     const handlePlayerInfoOnSubmit = (event) => {
@@ -69,10 +75,9 @@ const Home = () => {
         if (game.playerName === null || game.playerName.trim().length === 0) {
             alert("Player name is mandatory!");
         } else {
-            const playerMode = event.target[1].checked === true ? 'MANUAL' : 'AUTOMATIC';
-            const request = { playerName: game.playerName, playerMode: playerMode };
+            const playMode = game.playMode === true ? 'MANUAL' : 'AUTOMATIC';
+            const request = { playerName: game.playerName, playMode: playMode };
             wsClient.publish({ destination: '/server/join', body: JSON.stringify(request) });
-            setGame(prevGame => ({ ...prevGame, playerMode: event.target[1].checked }));
         }
     };
 
@@ -99,7 +104,7 @@ const Home = () => {
     };
 
     const resetState = () => {
-        setGame({ gameId: '', playerName: '', playerMode: false, playerRole: '', messages: [], gameState: 'PENDING' });
+        setGame({ gameId: '', playerName: '', playMode: false, playerRole: '', messages: [], gameState: 'PENDING' });
         setMessages([])
     };
 
@@ -117,19 +122,19 @@ const Home = () => {
                     <form onSubmit={handlePlayerInfoOnSubmit}>
                         <span>Enter your name: </span>
                         <input type='text' value={game.playerName} onChange={handleNameInput} className='name-input' />
-                        <input type='checkbox' className='play-type' checked={game.playerMode} onChange={handlePlayerMode} /> <span>Manual Mode</span>
+                        <input type='checkbox' className='play-type' checked={game.playMode} onChange={handlePlayMode} /> <span>Manual Mode</span>
                         <button type='submit' className='submit-name'>Submit</button>
                     </form>
                 </div>
             }
-            {game.gameState === 'IN_PROGRESS' && game.playerMode && game.playerRole === 'PLAYER1' &&
+            {game.gameState === 'IN_PROGRESS' && game.playMode && game.playerRole === 'PLAYER1' &&
                 <div className='number-input-div'>
                     <span><span style={{ fontWeight: 'bold' }}>{game.playerName}</span> since you're playing in Manual mode. Enter number to start: </span>
                     <input type='number' value={game.playerInputNumber} onChange={handleInputNumberOnChange} className='number-input' />
                     <button className='submit-name' onClick={handleInputNumberSubmit}>Submit</button>
                 </div>
             }
-            {isMyTurn() && game.playerMode &&
+            {isMyTurn() && game.playMode &&
                 <div className='next-move'>
                     <span><span style={{ fontWeight: 'bold' }}>{game.playerName}</span> select your next move:</span>
                     <button className='next-move-btn' onClick={() => handlePlayerNextMove(-1)}>-1</button>
