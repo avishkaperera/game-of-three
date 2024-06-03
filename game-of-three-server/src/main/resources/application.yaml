@@ -1,7 +1,3 @@
 spring:
   application:
     name: game-of-three
-
-  data:
-    mongodb:
-      uri: "mongodb://localhost:27017/gameofthree"
