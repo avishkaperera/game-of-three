@@ -42,21 +42,23 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void makeNextMove(MoveRequest request, CustomPrincipal principal) {
+    public Game makeNextMove(MoveRequest request, CustomPrincipal principal) {
         try {
             Game game = gameRepository.findById(request.gameId()).orElseThrow(() -> new GameException("Game not found. Start a new game."));
             Player player = findPlayerInGame(principal, game);
             game.play(player, request.playerMove(), messagingTemplate);
+            return game;
         } catch (GameException e) {
             handleException(e);
+            return null;
         }
     }
 
-    private static Player findPlayerInGame(CustomPrincipal principal, Game game) {
+    private Player findPlayerInGame(CustomPrincipal principal, Game game) throws GameException {
         return game.getPlayers().stream()
                 .filter(p -> principal.playerId().equals(p.getPlayerId()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new GameException("Player " + principal.playerId() + " not found in Game " + game.getGameId()));
     }
 
     private void joinPlayerToNewGame(Player player) {
