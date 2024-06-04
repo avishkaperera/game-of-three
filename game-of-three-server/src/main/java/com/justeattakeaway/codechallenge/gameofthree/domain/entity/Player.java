@@ -40,12 +40,14 @@ public class Player {
         setMove(new Move(currentGameNumber, currentGameNumber));
     }
 
-    public void makeMove(Integer currentGameNumber) {
+    public Integer makeMove(Integer currentGameNumber) {
         getMove().nextMove(currentGameNumber);
+        return getMove().getResultingValue();
     }
 
-    public void makeMove(Integer currentGameNumber, Integer playerMove) {
+    public Integer makeMove(Integer currentGameNumber, Integer playerMove) {
         getMove().nextMove(currentGameNumber, playerMove);
+        return getMove().getResultingValue();
     }
 
     public static Player aNewPlayer(String playerId, String playerName, String playMode) {

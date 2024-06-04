@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 
 @Getter
 @Setter
@@ -75,9 +76,8 @@ public class Game {
         }
     }
 
-    private void subsequentPlay(Player player, SimpMessagingTemplate messagingTemplate, Consumer<Player> move) {
-        move.accept(player);
-        setCurrentNumber(player.getMove().getResultingValue());
+    private void subsequentPlay(Player player, SimpMessagingTemplate messagingTemplate, ToIntFunction<Player> move) {
+        setCurrentNumber(move.applyAsInt(player));
         setGameState(getGameState().nextState());
         player.publishMoveMadeEvent(getGameState(), messagingTemplate);
     }
